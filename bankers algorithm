@@ -1,0 +1,110 @@
+# Banker's Algorithm - Deadlock Avoidance and Detection
+
+from typing import List
+
+# ---------- Deadlock Avoidance ----------
+
+def is_safe_state(available: List[int], max_demand: List[List[int]], allocation: List[List[int]]) -> bool:
+    n = len(max_demand)       # number of processes
+    m = len(available)        # number of resources
+
+    need = [[max_demand[i][j] - allocation[i][j] for j in range(m)] for i in range(n)]
+    finish = [False] * n
+    work = available[:]
+
+    safe_sequence = []
+
+    while len(safe_sequence) < n:
+        found = False
+        for i in range(n):
+            if not finish[i] and all(need[i][j] <= work[j] for j in range(m)):
+                for j in range(m):
+                    work[j] += allocation[i][j]
+                finish[i] = True
+                safe_sequence.append(i)
+                found = True
+                break
+        if not found:
+            return False  # No safe sequence
+    print("Safe sequence (Avoidance):", safe_sequence)
+    return True
+
+
+# ---------- Deadlock Detection ----------
+
+def detect_deadlock(available: List[int], allocation: List[List[int]], request: List[List[int]]) -> List[int]:
+    n = len(allocation)  # number of processes
+    m = len(available)   # number of resources
+
+    work = available[:]
+    finish = [False] * n
+
+    for i in range(n):
+        if all(allocation[i][j] == 0 for j in range(m)):
+            finish[i] = True
+
+    changed = True
+    while changed:
+        changed = False
+        for i in range(n):
+            if not finish[i] and all(request[i][j] <= work[j] for j in range(m)):
+                for j in range(m):
+                    work[j] += allocation[i][j]
+                finish[i] = True
+                changed = True
+
+    deadlocked_processes = [i for i, done in enumerate(finish) if not done]
+    return deadlocked_processes
+
+
+# ---------- Example Use ----------
+
+def main():
+    print("=== Banker's Algorithm ===\n")
+
+    # Resource instances
+    available = [3, 3, 2]
+
+    # Maximum demand of each process
+    max_demand = [
+        [7, 5, 3],
+        [3, 2, 2],
+        [9, 0, 2],
+        [2, 2, 2],
+        [4, 3, 3]
+    ]
+
+    # Allocated resources to each process
+    allocation = [
+        [0, 1, 0],
+        [2, 0, 0],
+        [3, 0, 2],
+        [2, 1, 1],
+        [0, 0, 2]
+    ]
+
+    # Request matrix for detection
+    request = [
+        [0, 0, 0],
+        [2, 0, 2],
+        [0, 0, 0],
+        [1, 0, 0],
+        [0, 0, 2]
+    ]
+
+    print("Checking for safe state (Avoidance):")
+    if is_safe_state(available, max_demand, allocation):
+        print("The system is in a SAFE state.")
+    else:
+        print("The system is in an UNSAFE state!")
+
+    print("\nDetecting Deadlock:")
+    deadlocked = detect_deadlock(available, allocation, request)
+    if deadlocked:
+        print(f"Deadlock detected in processes: {deadlocked}")
+    else:
+        print
+        ("No deadlock detected. All processes can complete.")
+
+if __name__ == "__main__":
+    main()
