@@ -45,3 +45,16 @@ Safe sequence is: P1 -> P3 -> P0 -> P2
    ```bash
    git clone https://github.com/<your-username>/bankers-algorithm.git
    cd bankers-algorithm
+2. Run the script:
+
+python bankers_algorithm.py
+
+Learning Outcome
+
+This project strengthened my understanding of:
+
+Deadlock avoidance in Operating Systems
+
+Translating algorithms into real code
+
+Writing modular and testable Python programs
